@@ -42,14 +42,16 @@
  *  I tried setting the parents to be the same since I thought the second genome might be screwing things up
  *    But it's now only doing the same behavior for the first two
  *    try hard coding all of them to be parent 1
+ *  ok that works but we can't fucking get it to do the same with the get generation code
+ *    I've no idea why it behaves this way, we just tried resizing but that didn't change anything for some reason. soooo confused
  *
- *  am I really fucking unlucky or is the behavior in one genome affecting another, making it so that it's either no jumps or 2+ jumps
  *
  *  TODO
+ *  don't store everything with the colors, have another cell so that we can have more than one bird go at once or have stuff be there but be invisible. This can also likely be used to make collision handling better.
  *  Try it with a different number of parents
  *  Tinker and mess with variables to see what works best
  *  make the pipe 1 start a larger distance away and see if it finds the invincibility area
- */
+*/
 
 
 #include <SDL2/SDL.h>
@@ -365,7 +367,10 @@ void get_generation(int generation_num){
     //Now we go and take random rules from each parent to initially create unmutated children
     //  We set it to 2 so that it doesn't count the parents as their own children
     for (int child_num = 2; child_num < generation_size; child_num++){
+      //printf("Pushing to child %i\n", child_num);
       //Start this with 5 so we can look back to mutate the output for this ruleset
+      //generations[generation_num][child_num].resize(parent1.size());
+      generations[generation_num][child_num].reserve(parent1.size());
       for (int ruleset_iter = 5; ruleset_iter < parent1_fitness; ruleset_iter+=5){
         //Loop through every 5 elements to get each set, we want to loop through the length of the one with greater fitness since this way we can continue to get values from the longer one even after we go past the length of the shorter parent
         //cout << "Iter: " << ruleset_iter << " Parent 1 fitness: " << parent1_fitness << endl;
@@ -412,14 +417,20 @@ void get_generation(int generation_num){
           //if ruleset_iter = 10, we do 5, 6, 7, 8, 9
           //cout << "Pushing" << endl;
           //k so it's only pushing 10 values to this for some reason, it's also not pushing all of them if it's telling the truth in the print
-          printf("Pushing: %i:%f\n", sub_ruleset_iter, parent_mutated[sub_ruleset_iter]);
+          //printf("Pushing: %i\t%i:%f\n", child_num, sub_ruleset_iter, parent_mutated[sub_ruleset_iter]);
           generations[generation_num][child_num].push_back(parent_mutated[sub_ruleset_iter]);
+          //It might be fucking up because it's resizing and thus filling it with 0s?
+          //print_1d_vector(generations[generation_num][child_num]);
+          //cout << endl;
         }
         //cout << "Post-push" << endl;
       }
       //lets see if we really are using the same one evry tim
-      print_1d_vector(parent_mutated);
+      //OI
+      //We just need to make sure the children become just like the parents
       print_1d_vector(generations[generation_num][child_num]);
+      /*cout << "The final child: " << endl;
+      print_1d_vector(generations[generation_num][child_num]);*/
     }
     //Temporary for testing
     /*
